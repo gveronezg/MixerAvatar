@@ -173,8 +173,8 @@ async function redrawCanvas(){
   // Ajuste de DPI para canvas (opcional) — mantém boa qualidade em telas retina
   fixCanvasDPI();
 
-  // Define filtro de cor: hue-rotate em deg
-  ctx.filter = `hue-rotate(${hue}deg) saturate(1.08)`;
+  // Sem filtros: renderização original da imagem
+  ctx.filter = 'none';
 
   // Desenha camadas na ordem especificada
   for (const key of DRAW_ORDER_KEYS){
@@ -255,8 +255,8 @@ function fixCanvasDPI(){
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   
   // Melhora a nitidez e antialiasing
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
+  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingQuality = 'low';
 }
 
 // Inicialização
