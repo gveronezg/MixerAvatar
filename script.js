@@ -1,7 +1,6 @@
 const ASSETS_BASE = 'assets'; // pasta com imagens
 
-// Configuração das categorias reais existentes em /assets
-// Cada categoria possui prefixo e uma faixa de probe para descobrir índices disponíveis
+// Cada categoria possui prefixo e uma faixa de probeMax para definir quantas imagens deve carregar
 const CATEGORIES = [
   { key: 'base',      label: 'Base',      prefix: 'base',      probeMax: 6 },
   { key: 'clothing',  label: 'Roupas',    prefix: 'clothing',  probeMax: 14 },
@@ -29,15 +28,13 @@ const parts = [];
 const partsRow = document.getElementById('partsRow');
 const canvas = document.getElementById('avatarCanvas');
 const ctx = canvas.getContext('2d', { alpha: true });
-
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const hueRange = document.getElementById('hueRange');
-// Elementos removidos - não precisamos mais dos textos de info
 const concludeBtn = document.getElementById('concludeBtn');
 
 let activePart = 0;
-let hue = 0; // 0..360
+let hue = 0; // 0...360
 
 // Cria estrutura das partes a partir das categorias reais
 async function initParts() {
