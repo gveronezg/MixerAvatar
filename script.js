@@ -3,14 +3,14 @@ const ASSETS_BASE = 'assets'; // pasta com imagens
 // Configuração das categorias reais existentes em /assets
 // Cada categoria possui prefixo e uma faixa de probe para descobrir índices disponíveis
 const CATEGORIES = [
-  { key: 'base',      label: 'Base',      prefix: 'base',      probeMax: 40 },
-  { key: 'clothing',  label: 'Roupas',    prefix: 'clothing',  probeMax: 60 },
-  { key: 'eyes',      label: 'Olhos',     prefix: 'eyes',      probeMax: 40 },
-  { key: 'eyebrows',  label: 'Sobrancelhas', prefix: 'eyebrows', probeMax: 30 },
-  { key: 'nose',      label: 'Nariz',     prefix: 'nose',      probeMax: 20 },
-  { key: 'mouth',     label: 'Boca',      prefix: 'mouth',     probeMax: 30 },
-  { key: 'hair',      label: 'Cabelo',    prefix: 'hair',      probeMax: 100 },
-  { key: 'glasses',   label: 'Óculos',    prefix: 'glasses',   probeMax: 40 },
+  { key: 'base',      label: 'Base',      prefix: 'base',      probeMax: 6 },
+  { key: 'clothing',  label: 'Roupas',    prefix: 'clothing',  probeMax: 14 },
+  { key: 'eyes',      label: 'Olhos',     prefix: 'eyes',      probeMax: 14 },
+  { key: 'eyebrows',  label: 'Sobrancelhas', prefix: 'eyebrows', probeMax: 9 },
+  { key: 'nose',      label: 'Nariz',     prefix: 'nose',      probeMax: 6 },
+  { key: 'mouth',     label: 'Boca',      prefix: 'mouth',     probeMax: 13 },
+  { key: 'hair',      label: 'Cabelo',    prefix: 'hair',      probeMax: 38 },
+  { key: 'glasses',   label: 'Óculos',    prefix: 'glasses',   probeMax: 13 },
 ];
 
 // Ordem de desenho no canvas (de baixo para cima)
