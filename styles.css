@@ -1,17 +1,15 @@
 /* ---------- Variáveis CSS (definidas em :root para serem reutilizáveis) ---------- */
 :root{
-  /* espaço base (gap) usado em vários lugares via var(--gap) */
-  --gap: 15px;
   /* cor de destaque/alerta usada em bordas e botões */
-  --accent: rgb(0, 0, 0);
+  --accent:rgb(247, 160, 45);
   /* cor de fundo global da página (não usada diretamente, apenas referência) */
   --bg: #fafafa;
   /* cor de fundo dos painéis (caixas brancas internas) */
   --panel-bg: #fff;
   /* cor "muted" (aqui definida como azul escuro) — atualmente não referenciada no CSS, mas disponível */
-  --muted: #0051ad;
-  /* raio de cantos padrão para elementos arredondados */
-  --radius: 15px;
+  --muted:rgb(30, 75, 160);
+  /* pixels de espacamento padrao */
+  --pxls: 5px;
 }
 
 /* Faz com que o tamanho do box inclua bordas e padding no cálculo de largura/altura */
@@ -25,12 +23,8 @@ body{
   margin:0;
   /* define uma pilha de fontes: tenta 'Inter', se não disponível usa fonte do sistema */
   font-family: Inter, system-ui, sans-serif;
-  /* cria um fundo com gradiente vertical sutil (do topo para baixo) */
-  background: linear-gradient(180deg,#f6f8fb,#eef2f6);
   /* cor padrão do texto em toda a página */
-  color:#000000;
-
-  background: rgb(245, 160, 45);
+  color:var(--accent);
 }
 
 /* Container principal que agrupa as duas colunas (visual + texto) */
@@ -45,19 +39,15 @@ body{
   padding:0px;
   /* usa Flexbox para dispor filhos em linha (padrão row) */
   display:flex;
-  /* espaçamento entre os itens flex (usa a variável definida em :root) */
-  gap:var(--gap);
   /* estica os painéis para preencher a altura */
   align-items:stretch;
 }
 
 /* Estilos base para os "painéis" (cada coluna é .panel) */
 .panel{
-  /* cor de fundo padronizada para painéis (branco) */
-  background:var(--panel-bg);
   /* padding interno para separar conteúdo das bordas do painel */
-  padding:5px;
-
+  padding:var(--pxls);
+  /* cor de fundo */
   background: rgb(30, 75, 160);
 }
 
@@ -87,23 +77,22 @@ body{
 }
 
 /* ---------- Cabeçalho com mini-thumbs (os 8 quadrantes no topo) ---------- */
-
 /* Container que agrupa as miniaturas/partes */
 .parts-row{
   display:grid;
   grid-template-columns: repeat(8, 1fr);
-  gap:5px;
-  padding:5px;
+  gap:var(--pxls);
+  padding:var(--pxls);
   width:100%;
-  border-radius:5px;
-  margin: 5px 0px 10px 0px;
+  border-radius:var(--pxls);
+  margin-bottom:var(--pxls);
   background:rgb(247, 160, 45);
 }
 
 /* Estilo de cada miniatura (quadrante) */
 .part-thumb{
   /* cantos arredondados */
-  border-radius:5px;
+  border-radius:var(--pxls);
   /* borda transparente padrão (ficará colorida se ativo) */
   border:2px solid transparent;
   /* centraliza conteúdo interno (imagem/ícone/numero) */
@@ -116,14 +105,13 @@ body{
   flex:0 0 auto;
   /* ocupar a célula inteira em grid e manter quadrado */
   width:100%;
+  /* manter proporção 1:1 (quadrado) */
   aspect-ratio:1/1;
 }
 
 /* Estado ativo do thumbnail (quando parte selecionada) */
 .part-thumb.active{
   /* usa a variável --accent para borda quando ativo */
-  border-color:var(--accent);
-  /* cor da borda */
   border-color: rgb(30, 75, 160);
 }
 
@@ -135,7 +123,7 @@ body{
   display:flex;
   flex-direction:column;
   /* espaçamento vertical entre canvas e controles */
-  gap:5px;
+  gap:var(--pxls);
 }
 
 /* Wrapper que centraliza o canvas */
