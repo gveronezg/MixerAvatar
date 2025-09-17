@@ -3,7 +3,7 @@
   /* espaço base (gap) usado em vários lugares via var(--gap) */
   --gap: 15px;
   /* cor de destaque/alerta usada em bordas e botões */
-  --accent: #d33;
+  --accent: rgb(0, 0, 0);
   /* cor de fundo global da página (não usada diretamente, apenas referência) */
   --bg: #fafafa;
   /* cor de fundo dos painéis (caixas brancas internas) */
@@ -29,6 +29,8 @@ body{
   background: linear-gradient(180deg,#f6f8fb,#eef2f6);
   /* cor padrão do texto em toda a página */
   color:#000000;
+
+  background: rgb(245, 160, 45);
 }
 
 /* Container principal que agrupa as duas colunas (visual + texto) */
@@ -55,6 +57,8 @@ body{
   background:var(--panel-bg);
   /* padding interno para separar conteúdo das bordas do painel */
   padding:5px;
+
+  background: rgb(30, 75, 160);
 }
 
 /* Painel da esquerda (visual + controles do avatar) */
@@ -88,16 +92,18 @@ body{
 .parts-row{
   display:grid;
   grid-template-columns: repeat(8, 1fr);
-  gap:8px;
-  padding:6px;
-  margin-bottom:10px;
+  gap:5px;
+  padding:5px;
   width:100%;
+  border-radius:5px;
+  margin: 5px 0px 10px 0px;
+  background:rgb(247, 160, 45);
 }
 
 /* Estilo de cada miniatura (quadrante) */
 .part-thumb{
   /* cantos arredondados */
-  border-radius:8px;
+  border-radius:5px;
   /* borda transparente padrão (ficará colorida se ativo) */
   border:2px solid transparent;
   /* centraliza conteúdo interno (imagem/ícone/numero) */
@@ -108,8 +114,6 @@ body{
   cursor:pointer;
   /* impede que cresça ou encolha; flex: 0 0 auto => fixo no tamanho definido */
   flex:0 0 auto;
-  /* fundo branco separado do painel */
-  background:#ff9e9e;
   /* ocupar a célula inteira em grid e manter quadrado */
   width:100%;
   aspect-ratio:1/1;
@@ -119,8 +123,8 @@ body{
 .part-thumb.active{
   /* usa a variável --accent para borda quando ativo */
   border-color:var(--accent);
-  /* sombra aumentada e com tom do accent para destaque */
-  box-shadow:0 4px 10px rgba(211,51,51,0.14);
+  /* cor da borda */
+  border-color: rgb(30, 75, 160);
 }
 
 /* ---------- Área do canvas e controles abaixo ---------- */
@@ -131,7 +135,7 @@ body{
   display:flex;
   flex-direction:column;
   /* espaçamento vertical entre canvas e controles */
-  gap:10px;
+  gap:5px;
 }
 
 /* Wrapper que centraliza o canvas */
@@ -199,10 +203,8 @@ canvas{
   align-items:center;
   /* espaço entre itens (gap interno) */
   gap:12px;
-  /* deixa o slider à esquerda e a informação à direita */
-  justify-content:space-between;
-  /* pequeno espaçamento superior */
-  margin-top:6px;
+  /* deixa o slider e as setas centralizadas */
+  justify-content:center
 }
 
 /* label que envolve o slider para facilitar posicionamento */
