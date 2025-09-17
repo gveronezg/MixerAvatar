@@ -1,12 +1,31 @@
-// Ajuste o caminho das imagens em ASSETS_BASE se necessário.
-
 const ASSETS_BASE = 'assets'; // pasta com imagens
-const NUM_PARTS = 8;
 
-// Para cada parte definimos quantas opções existem (se não souber, o script tentará carregar até um limite)
-const MAX_OPTIONS_TO_PROBE = 8; // tenta carregar opt1..opt8 por parte (ajuste se precisar)
+// Configuração das categorias reais existentes em /assets
+// Cada categoria possui prefixo e uma faixa de probe para descobrir índices disponíveis
+const CATEGORIES = [
+  { key: 'base',      label: 'Base',      prefix: 'base',      probeMax: 40 },
+  { key: 'clothing',  label: 'Roupas',    prefix: 'clothing',  probeMax: 60 },
+  { key: 'eyes',      label: 'Olhos',     prefix: 'eyes',      probeMax: 40 },
+  { key: 'eyebrows',  label: 'Sobrancelhas', prefix: 'eyebrows', probeMax: 30 },
+  { key: 'nose',      label: 'Nariz',     prefix: 'nose',      probeMax: 20 },
+  { key: 'mouth',     label: 'Boca',      prefix: 'mouth',     probeMax: 30 },
+  { key: 'hair',      label: 'Cabelo',    prefix: 'hair',      probeMax: 100 },
+  { key: 'glasses',   label: 'Óculos',    prefix: 'glasses',   probeMax: 40 },
+];
 
-const parts = []; // cada item: { index, options: [url,...], currentIndex }
+// Ordem de desenho no canvas (de baixo para cima)
+const DRAW_ORDER_KEYS = [
+  'base',
+  'clothing',
+  'eyes',
+  'eyebrows',
+  'nose',
+  'mouth',
+  'hair',
+  'glasses',
+];
+
+const parts = []; // cada item: { key, label, options: [url,...], currentIndex }
 const partsRow = document.getElementById('partsRow');
 const canvas = document.getElementById('avatarCanvas');
 const ctx = canvas.getContext('2d', { alpha: true });
@@ -14,43 +33,32 @@ const ctx = canvas.getContext('2d', { alpha: true });
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const hueRange = document.getElementById('hueRange');
-const currentPartEl = document.getElementById('currentPart');
-const currentOptionEl = document.getElementById('currentOption');
-const indexInfo = document.getElementById('indexInfo');
+// Elementos removidos - não precisamos mais dos textos de info
 const concludeBtn = document.getElementById('concludeBtn');
 
 let activePart = 0;
 let hue = 0; // 0..360
 
-// Cria estrutura das partes e tenta detectar opções
+// Cria estrutura das partes a partir das categorias reais
 async function initParts() {
-  for (let p = 1; p <= NUM_PARTS; p++) {
+  parts.length = 0;
+  for (const cat of CATEGORIES) {
     const options = [];
-    for (let o = 1; o <= MAX_OPTIONS_TO_PROBE; o++) {
-      const url = `${ASSETS_BASE}/part${p}_opt${o}.png`;
-      // verifica existência — carregando imagem (promise)
+    const maxProbe = Math.max(1, cat.probeMax || 40);
+    for (let i = 1; i <= maxProbe; i++) {
+      const url = `${ASSETS_BASE}/${cat.prefix}${String(i).padStart(2,'0')}.png`;
       try {
         await imageExists(url);
         options.push(url);
       } catch (err) {
-        // Falha; assume que não há mais opções (se for opt1 falhar, tenta thumb fallback)
-        // continue tentando: se opt1 não existir, isso significa que parte tem zero opções.
-      }
-    }
-    // fallback: se não houver options, tente uma imagem padrão (ex: part{p}.png) — útil para integrar
-    if (options.length === 0) {
-      const fallback = `${ASSETS_BASE}/part${p}.png`;
-      try {
-        await imageExists(fallback);
-        options.push(fallback);
-      } catch (e) {
-        // sem imagem para essa parte — ainda adicionamos uma lista vazia
+        // simplesmente ignore índices inexistentes (permite buracos como glasses01 ausente)
       }
     }
     parts.push({
-      index: p - 1,
+      key: cat.key,
+      label: cat.label,
       options,
-      currentIndex: 0
+      currentIndex: 0,
     });
   }
 
@@ -69,30 +77,30 @@ function imageExists(url){
   });
 }
 
-// Renderiza o cabeçalho com 8 quadrantes
+// Renderiza o cabeçalho com um quadrante por categoria
 function renderHeader(){
   partsRow.innerHTML = '';
-  for (let i = 0; i < NUM_PARTS; i++){
+  for (let i = 0; i < parts.length; i++){
     const p = parts[i];
     const div = document.createElement('button');
     div.className = 'part-thumb';
-    div.title = `Parte ${i+1}`;
+    div.title = `${p?.label || 'Parte'} ${i+1}`;
     div.dataset.part = i;
     div.setAttribute('aria-pressed','false');
 
-    // usa thumb se existir ou a primeira opção como preview
-    const thumbUrl = (p.options && p.options.length>0) ? p.options[0] : null;
+    // usa a opção atual como preview (thumb)
+    const thumbUrl = (p.options && p.options.length>0) ? p.options[p.currentIndex] : null;
     if (thumbUrl){
       const img = document.createElement('img');
       img.src = thumbUrl;
-      img.alt = `Thumb parte ${i+1}`;
+      img.alt = `Thumb ${p?.label || 'Parte'} ${i+1}`;
       img.style.width = '100%';
       img.style.height = '100%';
       img.style.objectFit = 'cover';
       img.style.borderRadius = '6px';
       div.appendChild(img);
     } else {
-      div.textContent = `${i+1}`;
+      div.textContent = `${p?.label || (i+1)}`;
       div.style.fontWeight = '600';
       div.style.color = '#333';
     }
@@ -122,29 +130,23 @@ function highlightActiveThumb(){
 function setActivePart(i){
   activePart = i;
   highlightActiveThumb();
-  updateIndexInfo();
 }
 
-// Atualiza texto de info
-function updateIndexInfo(){
-  currentPartEl.textContent = activePart + 1;
-  const p = parts[activePart];
-  currentOptionEl.textContent = (p && p.options.length>0) ? (p.currentIndex + 1) : 0;
-}
+// Função removida - não precisamos mais atualizar textos de info
 
 // Botões de navegação para a parte ativa (loop)
 prevBtn.addEventListener('click', () => {
   const p = parts[activePart];
   if (!p || p.options.length === 0) return;
   p.currentIndex = (p.currentIndex - 1 + p.options.length) % p.options.length;
-  updateIndexInfo();
+  updateThumbForPart(activePart);
   redrawCanvas();
 });
 nextBtn.addEventListener('click', () => {
   const p = parts[activePart];
   if (!p || p.options.length === 0) return;
   p.currentIndex = (p.currentIndex + 1) % p.options.length;
-  updateIndexInfo();
+  updateThumbForPart(activePart);
   redrawCanvas();
 });
 
@@ -166,7 +168,7 @@ concludeBtn.addEventListener('click', () => {
   }
 });
 
-// Redesenha: carrega todas as camadas e desenha em ordem de partes 1..8
+// Redesenha: carrega todas as camadas e desenha na ordem definida em DRAW_ORDER_KEYS
 async function redrawCanvas(){
   // Limpa
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -177,9 +179,9 @@ async function redrawCanvas(){
   // Define filtro de cor: hue-rotate em deg
   ctx.filter = `hue-rotate(${hue}deg) saturate(1.08)`;
 
-  // Desenha camadas na ordem de partes (você pode mudar a ordem conforme seu layout)
-  for (let i = 0; i < parts.length; i++){
-    const p = parts[i];
+  // Desenha camadas na ordem especificada
+  for (const key of DRAW_ORDER_KEYS){
+    const p = parts.find(pt => pt.key === key);
     if (!p || p.options.length === 0) continue;
     const url = p.options[p.currentIndex];
     try {
@@ -210,6 +212,33 @@ function loadImage(src){
   });
 }
 
+function updateThumbForPart(i){
+  const p = parts[i];
+  if (!p) return;
+  const el = partsRow.querySelector(`.part-thumb[data-part="${i}"]`);
+  if (!el) return;
+  const thumbUrl = (p.options && p.options.length>0) ? p.options[p.currentIndex] : null;
+  let img = el.querySelector('img');
+  if (thumbUrl){
+    if (!img){
+      img = document.createElement('img');
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '6px';
+      el.textContent = '';
+      el.appendChild(img);
+    }
+    img.src = thumbUrl;
+    img.alt = `Thumb ${p?.label || 'Parte'} ${i+1}`;
+  } else {
+    if (img) img.remove();
+    el.textContent = `${p?.label || (i+1)}`;
+    el.style.fontWeight = '600';
+    el.style.color = '#333';
+  }
+}
+
 function fixCanvasDPI(){
   const ratio = window.devicePixelRatio || 1;
   const w = canvas.width;
@@ -219,6 +248,10 @@ function fixCanvasDPI(){
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  
+  // Melhora a nitidez e antialiasing
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
 }
 
 // Inicialização

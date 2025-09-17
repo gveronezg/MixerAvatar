@@ -1,146 +1,278 @@
+/* ---------- Variáveis CSS (definidas em :root para serem reutilizáveis) ---------- */
 :root{
-    --gap: 14px;
-    --accent: #d33;
-    --bg: #fafafa;
-    --panel-bg: #fff;
-    --muted: #666;
-    --radius: 14px;
-  }
-  
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: Inter, system-ui, sans-serif;
-    background: linear-gradient(180deg,#f6f8fb,#eef2f6);
-    color:#222;
-  }
-  
+  /* espaço base (gap) usado em vários lugares via var(--gap) */
+  --gap: 15px;
+  /* cor de destaque/alerta usada em bordas e botões */
+  --accent: #d33;
+  /* cor de fundo global da página (não usada diretamente, apenas referência) */
+  --bg: #fafafa;
+  /* cor de fundo dos painéis (caixas brancas internas) */
+  --panel-bg: #fff;
+  /* cor "muted" (aqui definida como azul escuro) — atualmente não referenciada no CSS, mas disponível */
+  --muted: #0051ad;
+  /* raio de cantos padrão para elementos arredondados */
+  --radius: 15px;
+}
+
+/* Faz com que o tamanho do box inclua bordas e padding no cálculo de largura/altura */
+*{
+  box-sizing:border-box;
+}
+
+/* Estilos globais do <body> */
+body{
+  /* remove a margem padrão do navegador para que o layout aproveite toda a janela */
+  margin:0;
+  /* define uma pilha de fontes: tenta 'Inter', se não disponível usa fonte do sistema */
+  font-family: Inter, system-ui, sans-serif;
+  /* cria um fundo com gradiente vertical sutil (do topo para baixo) */
+  background: linear-gradient(180deg,#f6f8fb,#eef2f6);
+  /* cor padrão do texto em toda a página */
+  color:#000000;
+}
+
+/* Container principal que agrupa as duas colunas (visual + texto) */
+.container{
+  /* limita largura máxima do container — aqui 100% da largura disponível */
+  max-width: 100%;
+  /* ocupa altura total da viewport para permitir 100% vertical dos painéis */
+  height:100vh;
+  /* margem superior/inferior de 24px e centraliza horizontalmente (auto nas laterais) */
+  margin:0px auto;
+  /* preenchimento interno do container para afastar conteúdo das bordas */
+  padding:0px;
+  /* usa Flexbox para dispor filhos em linha (padrão row) */
+  display:flex;
+  /* espaçamento entre os itens flex (usa a variável definida em :root) */
+  gap:var(--gap);
+  /* estica os painéis para preencher a altura */
+  align-items:stretch;
+}
+
+/* Estilos base para os "painéis" (cada coluna é .panel) */
+.panel{
+  /* cor de fundo padronizada para painéis (branco) */
+  background:var(--panel-bg);
+  /* padding interno para separar conteúdo das bordas do painel */
+  padding:5px;
+}
+
+/* Painel da esquerda (visual + controles do avatar) */
+.visual-panel{
+  /* ocupa 50% horizontal (1:1 com o texto) */
+  flex:1;
+  /* largura mínima para evitar que o painel quebre para tamanhos pequenos */
+  min-width:320px;
+  /* 100% da altura disponível */
+  height:100%;
+}
+
+/* Painel da direita (texto + concluir) */
+.text-panel{
+  /* ocupa 50% horizontal (1:1 com o visual) */
+  flex:1;
+  /* largura mínima para a coluna de texto */
+  min-width:260px;
+  /* define layout interno em coluna para organizar título, parágrafo e botão */
+  display:flex;
+  flex-direction:column;
+  /* força espaço entre o conteúdo e o botão de concluir (empurra para baixo) */
+  justify-content:space-between;
+  /* 100% da altura disponível */
+  height:100%;
+}
+
+/* ---------- Cabeçalho com mini-thumbs (os 8 quadrantes no topo) ---------- */
+
+/* Container que agrupa as miniaturas/partes */
+.parts-row{
+  display:grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap:8px;
+  padding:6px;
+  margin-bottom:10px;
+  width:100%;
+}
+
+/* Estilo de cada miniatura (quadrante) */
+.part-thumb{
+  /* cantos arredondados */
+  border-radius:8px;
+  /* borda transparente padrão (ficará colorida se ativo) */
+  border:2px solid transparent;
+  /* centraliza conteúdo interno (imagem/ícone/numero) */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  /* cursor indica que é clicável */
+  cursor:pointer;
+  /* impede que cresça ou encolha; flex: 0 0 auto => fixo no tamanho definido */
+  flex:0 0 auto;
+  /* fundo branco separado do painel */
+  background:#ff9e9e;
+  /* ocupar a célula inteira em grid e manter quadrado */
+  width:100%;
+  aspect-ratio:1/1;
+}
+
+/* Estado ativo do thumbnail (quando parte selecionada) */
+.part-thumb.active{
+  /* usa a variável --accent para borda quando ativo */
+  border-color:var(--accent);
+  /* sombra aumentada e com tom do accent para destaque */
+  box-shadow:0 4px 10px rgba(211,51,51,0.14);
+}
+
+/* ---------- Área do canvas e controles abaixo ---------- */
+
+/* Container vertical que agrupa canvas e controles (slider, info) */
+.canvas-area{
+  /* layout em coluna para empilhar canvas e controles */
+  display:flex;
+  flex-direction:column;
+  /* espaçamento vertical entre canvas e controles */
+  gap:10px;
+}
+
+/* Wrapper que centraliza o canvas */
+.canvas-wrapper{
+  /* centraliza horizontalmente o canvas */
+  display:flex;
+  justify-content:center;
+  /* posição relativa para permitir posicionar elementos absolutos dentro, se necessário */
+  position:relative;
+}
+
+/* Estilo do elemento <canvas> onde o avatar é desenhado */
+canvas{
+  /* canvas ocupa 100% da largura disponível do wrapper (até o max-width) */
+  width:100%;
+  /* largura máxima para não esticar muito em telas grandes */
+  max-width:520px;
+  /* altura automática para preservar proporção (quando possível) */
+  height:auto;
+  /* fundo com leve gradiente para "fundo de cartão" */
+  background:linear-gradient(180deg, #fff, #f7f9fb);
+  /* cantos arredondados */
+  border-radius:10px;
+  /* borda muito sutil */
+  border:1px solid rgba(0,0,0,0.04);
+  /* sombra para destaque do canvas sobre o fundo */
+  box-shadow:0 6px 18px rgba(2,6,23,0.04);
+}
+
+/* ---------- Botões de navegação (esquerda/direita ao lado do canvas) ---------- */
+
+.nav-btn{
+  /* botão visual transparente (só o ícone/texto aparece) */
+  background:transparent;
+  /* remove borda default de botões para um visual limpo */
+  border:none;
+  /* tamanho de fonte para o símbolo de seta */
+  font-size:22px;
+  /* largura fixa do botão */
+  width:38px;
+  /* altura fixa do botão */
+  height:38px;
+  /* cantos arredondados */
+  border-radius:8px;
+  /* indica que é clicável */
+  cursor:pointer;
+  /* usa grid para centralizar o conteúdo (ícone) facilmente */
+  display:inline-grid;
+  place-items:center;
+  /* impede selecionar o texto ao clicar e arrastar */
+  user-select:none;
+}
+
+/* Efeito visual ao passar o mouse: "levantar" o botão 2px */
+.nav-btn:hover{
+  transform:translateY(-2px);
+}
+
+/* ---------- Controles abaixo do canvas (slider de cor e info) ---------- */
+
+.controls{
+  /* usa flex para dispor o slider e o texto de info nas extremidades */
+  display:flex;
+  /* alinha verticalmente os itens do controle */
+  align-items:center;
+  /* espaço entre itens (gap interno) */
+  gap:12px;
+  /* deixa o slider à esquerda e a informação à direita */
+  justify-content:space-between;
+  /* pequeno espaçamento superior */
+  margin-top:6px;
+}
+
+/* label que envolve o slider para facilitar posicionamento */
+.slider-label{
+  /* flex row para organizar rótulo + elemento do slider */
+  display:flex;
+  /* espaço entre rótulo e input */
+  gap:8px;
+  /* centraliza verticalmente texto e input */
+  align-items:center;
+}
+
+/* largura fixa do input range para consistência visual em desktop */
+input[type=range]{
+  width:260px;
+}
+
+/* ---------- Painel de texto / botão concluir ---------- */
+
+.text-content{
+  /* padding interno para separar o texto das bordas do painel */
+  padding:8px;
+}
+
+/* linha do rodapé onde fica o botão concluir */
+.finish-row{
+  /* usa flex para centralizar horizontalmente o botão */
+  display:flex;
+  justify-content:center;
+  /* padding interno */
+  padding:12px;
+}
+
+/* estilo do botão "CONCLUIR" */
+.btn-conclude{
+  /* cor de fundo usando a variável de destaque */
+  background:var(--accent);
+  /* texto em branco para contraste */
+  color:#fff;
+  /* preenchimento interno para dar área clicável confortável */
+  padding:10px 18px;
+  /* cantos arredondados */
+  border-radius:8px;
+  /* remove borda padrão */
+  border:none;
+  /* cursor de clique */
+  cursor:pointer;
+  /* sombra maior para efeito de elevação */
+  box-shadow:0 8px 20px rgba(211,51,51,0.18);
+}
+
+/* ---------- Responsividade: empilha em telas menores ----------- */
+
+@media (max-width:880px){
+  /* quando a largura da viewport for <= 880px, empilha os painéis verticalmente */
   .container{
-    max-width:1100px;
-    margin:24px auto;
-    padding:18px;
-    display:flex;
-    gap:var(--gap);
-    align-items:flex-start;
-  }
-  
-  /* Panels */
-  .panel{
-    background:var(--panel-bg);
-    border-radius:12px;
-    padding:12px;
-    box-shadow:0 6px 18px rgba(16,24,40,0.06);
-  }
-  
-  .visual-panel{
-    flex:1.3;
-    min-width:300px;
-  }
-  
-  .text-panel{
-    flex:0.8;
-    min-width:260px;
-    display:flex;
+    /* muda orientação do flex de row (padrão) para column */
     flex-direction:column;
-    justify-content:space-between;
+    /* reduz o padding para ganhar espaço em telas pequenas */
+    padding:0px;
   }
-  
-  /* header parts */
-  .parts-row{
-    display:flex;
-    gap:8px;
-    padding:6px;
-    overflow-x:auto;
-    margin-bottom:10px;
-  }
-  
-  .part-thumb{
-    width:46px;
-    height:46px;
-    border-radius:8px;
-    border:2px solid transparent;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    flex:0 0 auto;
-    background:#fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  }
-  
-  .part-thumb.active{
-    border-color:var(--accent);
-    box-shadow:0 4px 10px rgba(211,51,51,0.14);
-  }
-  
-  /* canvas area */
-  .canvas-area{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
-  
-  .canvas-wrapper{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    position:relative;
-  }
-  
-  canvas{
+
+  /* faz cada painel ocupar 100% da largura disponível ao empilhar */
+  .visual-panel, .text-panel{
     width:100%;
-    max-width:520px;
-    height:auto;
-    background:linear-gradient(180deg, #fff, #f7f9fb);
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,0.04);
-    box-shadow:0 6px 18px rgba(2,6,23,0.04);
+    height:50vh;
   }
-  
-  /* nav buttons */
-  .nav-btn{
-    background:transparent;
-    border:none;
-    font-size:22px;
-    width:38px;
-    height:38px;
-    border-radius:8px;
-    cursor:pointer;
-    display:inline-grid;
-    place-items:center;
-    user-select:none;
+
+  /* faz o slider ocupar toda a largura disponível no mobile */
+  input[type=range]{
+    width:100%;
   }
-  .nav-btn:hover{transform:translateY(-2px)}
-  
-  /* controls */
-  .controls{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    justify-content:space-between;
-    margin-top:6px;
-  }
-  .slider-label{display:flex;gap:8px;align-items:center}
-  input[type=range]{width:260px}
-  
-  /* text panel */
-  .text-content{padding:8px}
-  .finish-row{display:flex;justify-content:center;padding:12px}
-  .btn-conclude{
-    background:var(--accent);
-    color:#fff;
-    padding:10px 18px;
-    border-radius:8px;
-    border:none;
-    cursor:pointer;
-    box-shadow:0 8px 20px rgba(211,51,51,0.18);
-  }
-  
-  /* Responsive: mobile stack */
-  @media (max-width:880px){
-    .container{flex-direction:column;padding:12px}
-    .visual-panel, .text-panel{width:100%}
-    .parts-row{justify-content:flex-start}
-    input[type=range]{width:100%}
-  }  
+}

@@ -8,28 +8,27 @@
 </head>
 <body>
   <main class="container">
-    <!-- PRIMEIRA DIV: visual + controles -->
-    <section class="panel visual-panel" aria-label="Área de criação do avatar">
+    <!-- DIV Esquerda/Cima -->
+    <div class="panel visual-panel" aria-label="Área de criação do avatar">
       <header class="parts-header" role="tablist">
-        <!-- 8 quadrantes -->
         <div class="parts-row" id="partsRow"></div>
       </header>
+
       <div class="canvas-area">
         <div class="canvas-wrapper">
-          <button class="nav-btn left" id="prevBtn" aria-label="Anterior">◀</button>
           <canvas id="avatarCanvas" width="320" height="320" aria-label="Canvas do avatar"></canvas>
+        </div>
+
+        <div class="controls">
+          <button class="nav-btn left" id="prevBtn" aria-label="Anterior">◀</button>
+          <input id="hueRange" type="range" min="0" max="360" value="0" class="hue-slider" />
           <button class="nav-btn right" id="nextBtn" aria-label="Próximo">▶</button>
         </div>
-        <div class="controls">
-          <label class="slider-label">Cor / Tom
-            <input id="hueRange" type="range" min="0" max="360" value="0" />
-          </label>
-          <div class="index-info" id="indexInfo">Parte <span id="currentPart">1</span> — Opção <span id="currentOption">1</span></div>
-        </div>
       </div>
-    </section>
-    <!-- SEGUNDA DIV: texto + concluir -->
-    <aside class="panel text-panel" aria-label="Informações">
+    </div>
+
+    <!-- DIV Direita/Baixo -->
+    <div class="panel text-panel" aria-label="Informações">
       <div class="text-content">
         <h2>Todos os textos necessários serão inseridos nessa área</h2>
         <p>Espaço para instruções, descrições ou perguntas ao usuário. Aqui ficam as informações complementares do avatar.</p>
@@ -37,8 +36,9 @@
       <div class="finish-row">
         <button id="concludeBtn" class="btn-conclude">CONCLUIR</button>
       </div>
-    </aside>
+    </div>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
