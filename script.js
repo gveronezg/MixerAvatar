@@ -25,7 +25,7 @@ const DRAW_ORDER_KEYS = [
   'glasses',
 ];
 
-const parts = []; // cada item: { key, label, options: [url,...], currentIndex }
+const parts = [];
 const partsRow = document.getElementById('partsRow');
 const canvas = document.getElementById('avatarCanvas');
 const ctx = canvas.getContext('2d', { alpha: true });
