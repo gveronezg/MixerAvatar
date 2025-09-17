@@ -119,15 +119,6 @@ body{
 
 /* Container vertical que agrupa canvas e controles (slider, info) */
 .canvas-area{
-  /* layout em coluna para empilhar canvas e controles */
-  display:flex;
-  flex-direction:column;
-  /* espaçamento vertical entre canvas e controles */
-  gap:var(--pxls);
-}
-
-/* Wrapper que centraliza o canvas */
-.canvas-wrapper{
   /* centraliza horizontalmente o canvas */
   display:flex;
   justify-content:center;
