@@ -186,12 +186,14 @@ async function redrawCanvas(){
     const url = p.options[p.currentIndex];
     try {
       const img = await loadImage(url);
-      // Centraliza a imagem no canvas. Você pode alterar sizing/posicionamento conforme precisar.
-      const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+      // Centraliza a imagem no canvas usando as dimensões CSS
+      const styleWidth = parseInt(getComputedStyle(canvas).width, 10);
+      const styleHeight = parseInt(getComputedStyle(canvas).height, 10);
+      const scale = Math.min(styleWidth / img.width, styleHeight / img.height);
       const w = img.width * scale;
       const h = img.height * scale;
-      const x = (canvas.width - w) / 2;
-      const y = (canvas.height - h) / 2;
+      const x = (styleWidth - w) / 2;
+      const y = (styleHeight - h) / 2;
       ctx.drawImage(img, x, y, w, h);
     } catch (e) {
       // erro carregando imagem — ignora
@@ -241,12 +243,18 @@ function updateThumbForPart(i){
 
 function fixCanvasDPI(){
   const ratio = window.devicePixelRatio || 1;
-  const w = canvas.width;
-  const h = canvas.height;
-  canvas.width = Math.round(w * ratio);
-  canvas.height = Math.round(h * ratio);
-  canvas.style.width = w + 'px';
-  canvas.style.height = h + 'px';
+  // Usa as dimensões do CSS como base, não as internas do canvas
+  const styleWidth = parseInt(getComputedStyle(canvas).width, 10);
+  const styleHeight = parseInt(getComputedStyle(canvas).height, 10);
+  
+  // Define as dimensões internas do canvas baseadas no CSS
+  canvas.width = Math.round(styleWidth * ratio);
+  canvas.height = Math.round(styleHeight * ratio);
+  
+  // Mantém as dimensões CSS inalteradas
+  canvas.style.width = styleWidth + 'px';
+  canvas.style.height = styleHeight + 'px';
+  
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
   
   // Melhora a nitidez e antialiasing
@@ -263,8 +271,15 @@ function fixCanvasDPI(){
   window.addEventListener('resize', () => {
     // redimensiona físico mantendo a largura máxima
     const parentWidth = canvas.parentElement.clientWidth - 20;
-    canvas.width = Math.min(520, parentWidth);
-    canvas.height = Math.round(canvas.width * 0.75);
+    const newWidth = Math.min(520, parentWidth);
+    const newHeight = Math.round(newWidth * 0.75);
+    
+    // Define as dimensões CSS primeiro
+    canvas.style.width = newWidth + 'px';
+    canvas.style.height = newHeight + 'px';
+    
+    // Depois ajusta as dimensões internas baseadas no CSS
+    fixCanvasDPI();
     redrawCanvas();
   });
 

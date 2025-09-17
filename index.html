@@ -3,42 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Avatar Mixer - Versão 3</title>
+  <title>Avatar Mixer</title>
   <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Monte seu avatar combinando partes e exporte a imagem." />
 </head>
 <body>
   <main class="container">
     <!-- DIV Esquerda/Cima -->
-    <div class="panel visual-panel" aria-label="Área de criação do avatar">
-      <header class="parts-header" role="tablist">
-        <div class="parts-row" id="partsRow"></div>
-      </header>
+    <section class="panel visual-panel" aria-label="Criação do avatar">
+      <div class="parts-row" id="partsRow"></div>
 
       <div class="canvas-area">
         <div class="canvas-wrapper">
-          <canvas id="avatarCanvas" width="320" height="320" aria-label="Canvas do avatar"></canvas>
+          <canvas id="avatarCanvas" width="320" height="320" aria-label="Avatar"></canvas>
         </div>
 
         <div class="controls">
           <button class="nav-btn left" id="prevBtn" aria-label="Anterior">◀</button>
-          <input id="hueRange" type="range" min="0" max="360" value="0" class="hue-slider" />
+          <input id="hueRange" type="range" value="0" class="hue-slider" aria-label="Matiz (cor)" />
           <button class="nav-btn right" id="nextBtn" aria-label="Próximo">▶</button>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- DIV Direita/Baixo -->
-    <div class="panel text-panel" aria-label="Informações">
+    <section class="panel text-panel" aria-label="Informações">
       <div class="text-content">
-        <h2>Todos os textos necessários serão inseridos nessa área</h2>
-        <p>Espaço para instruções, descrições ou perguntas ao usuário. Aqui ficam as informações complementares do avatar.</p>
+        <h2>Personalize seu avatar</h2>
+        <p>Escolha as partes no topo, navegue pelas opções com as setas e ajuste a cor pelo controle deslizante.</p>
       </div>
       <div class="finish-row">
         <button id="concludeBtn" class="btn-conclude">CONCLUIR</button>
       </div>
-    </div>
+    </section>
   </main>
 
   <script src="script.js"></script>
+  
 </body>
 </html>
