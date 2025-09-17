@@ -59,6 +59,9 @@ body{
   min-width:320px;
   /* 100% da altura disponível */
   height:100%;
+  /* organiza cabeçalho, área do canvas e controles em coluna */
+  display:flex;
+  flex-direction:column;
 }
 
 /* Painel da direita (texto + concluir) */
@@ -117,23 +120,24 @@ body{
 
 /* ---------- Área do canvas e controles abaixo ---------- */
 
-/* Container vertical que agrupa canvas e controles (slider, info) */
+/* Área onde o canvas deve ocupar o máximo possível (quadrado) */
 .canvas-area{
-  /* centraliza horizontalmente o canvas */
   display:flex;
   justify-content:center;
-  /* posição relativa para permitir posicionar elementos absolutos dentro, se necessário */
+  align-items:center;
   position:relative;
+  /* expande para ocupar o espaço vertical disponível do painel */
+  flex:1 1 auto;
+  min-height:0;
 }
 
 /* Estilo do elemento <canvas> onde o avatar é desenhado */
 canvas{
-  /* canvas ocupa 100% da largura disponível do wrapper (até o max-width) */
-  width:100%;
-  /* largura máxima para não esticar muito em telas grandes */
-  max-width:520px;
-  /* altura automática para preservar proporção (quando possível) */
+  /* o JS controlará width/height para manter 1:1; aqui apenas limites elásticos */
+  width:auto;
   height:auto;
+  max-width:100%;
+  max-height:100%;
   /* fundo com leve gradiente para "fundo de cartão" */
   background:linear-gradient(180deg, #fff, #f7f9fb);
   /* cantos arredondados */

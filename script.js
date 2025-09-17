@@ -264,18 +264,18 @@ function fixCanvasDPI(){
   // tenta inicializar e depois desenhar
   await initParts();
 
-  // redimensiona canvas responsivamente se quiser (manter proporção)
+  // Redimensiona o canvas para um quadrado máximo que caiba em .canvas-area
   window.addEventListener('resize', () => {
-    // redimensiona físico mantendo a largura máxima
-    const parentWidth = canvas.parentElement.clientWidth - 20;
-    const newWidth = Math.min(520, parentWidth);
-    const newHeight = Math.round(newWidth * 0.75);
-    
-    // Define as dimensões CSS primeiro
-    canvas.style.width = newWidth + 'px';
-    canvas.style.height = newHeight + 'px';
-    
-    // Depois ajusta as dimensões internas baseadas no CSS
+    const area = document.querySelector('.canvas-area');
+    const availableWidth = area.clientWidth;
+    const availableHeight = area.clientHeight;
+    const size = Math.max(1, Math.min(availableWidth, availableHeight));
+
+    // Define o tamanho visual do canvas (1:1)
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+
+    // Ajusta o DPI e redesenha
     fixCanvasDPI();
     redrawCanvas();
   });
