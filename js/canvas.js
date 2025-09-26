@@ -34,6 +34,10 @@ export async function redrawCanvas() {
     if (!p || p.options.length === 0) continue;
 
     const url = p.options[p.currentIndex];
+
+    // Se for a segunda opção de óculos, deixa o avatar sem óculos
+    if (url.endsWith('glasses02.png')) continue;
+
     try {
       const img = await loadImage(url);
       await drawSmoothImage(ctx, img, styleWidth, styleHeight);

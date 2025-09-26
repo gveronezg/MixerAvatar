@@ -56,7 +56,7 @@ body{
   /* ocupa 50% horizontal (1:1 com o texto) */
   flex:1;
   /* largura mínima para evitar que o painel quebre para tamanhos pequenos */
-  min-width:320px;
+  min-width:360px;
   /* 100% da altura disponível */
   height:100%;
   /* organiza cabeçalho, área do canvas e controles em coluna */

@@ -52,7 +52,8 @@ export function updateThumbForPart(i){
   const thumbUrl = p.options[p.currentIndex];
   let img = el.querySelector('img');
 
-  if(thumbUrl){
+  // Se for "glasses01.png", considera invisível
+  if(thumbUrl && !thumbUrl.endsWith('glasses02.png')){
     if(!img){
       img = document.createElement('img');
       img.style.width='100%';
@@ -64,7 +65,8 @@ export function updateThumbForPart(i){
     }
     img.src = thumbUrl;
   } else {
+    // imagem invisível ou inexistente: remove <img> e mantém o espaço
     if(img) img.remove();
-    el.textContent = p.label;
+    el.textContent = ''; // deixa a caixinha vazia
   }
 }

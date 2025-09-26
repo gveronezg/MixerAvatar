@@ -14,7 +14,7 @@ export function loadImage(src){
  */
 export async function drawSmoothImage(ctx, img, canvasWidth, canvasHeight) {
   ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
+  ctx.imageSmoothingQuality = 'low';
 
   // Calcula proporção da imagem
   const imgRatio = img.width / img.height;
