@@ -1,0 +1,18 @@
+export const ASSETS_BASE = 'assets'; // pasta com imagens
+
+// Cada categoria possui prefixo e uma faixa de probeMax para definir quantas imagens deve carregar
+export const CATEGORIES = [
+  { key: 'base', label: 'Base', prefix: 'base', probeMax: 6 },
+  { key: 'clothing', label: 'Roupas', prefix: 'clothing', probeMax: 14 },
+  { key: 'eyes', label: 'Olhos', prefix: 'eyes', probeMax: 14 },
+  { key: 'eyebrows', label: 'Sobrancelhas', prefix: 'eyebrows', probeMax: 9 },
+  { key: 'nose', label: 'Nariz', prefix: 'nose', probeMax: 6 },
+  { key: 'mouth', label: 'Boca', prefix: 'mouth', probeMax: 13 },
+  { key: 'hair', label: 'Cabelo', prefix: 'hair', probeMax: 38 },
+  { key: 'glasses', label: 'Óculos', prefix: 'glasses', probeMax: 13 },
+];
+
+// Ordem de desenho no canvas (de baixo para cima)
+export const DRAW_ORDER_KEYS = [
+  'base','clothing','eyes','eyebrows','nose','mouth','hair','glasses'
+];
