@@ -81,58 +81,14 @@ function shouldPreserveColor(partKey, r,g,b){
   return false;
 }
 
-// Aplica rotação de matiz rápida em RGB via conversão HSL aproximada
-function rgbToHsl(r, g, b){
-  r/=255; g/=255; b/=255;
-  const max = Math.max(r,g,b), min = Math.min(r,g,b);
-  let h, s, l = (max+min)/2;
-  if (max === min){
-    h = s = 0;
-  } else {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch(max){
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      default: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-  return { h, s, l };
-}
-
-function hslToRgb(h, s, l){
-  let r, g, b;
-  if (s === 0){
-    r = g = b = l; // achromático
-  } else {
-    const hue2rgb = (p, q, t) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1/6) return p + (q - p) * 6 * t;
-      if (t < 1/2) return q;
-      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-      return p;
-    };
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1/3);
-    g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1/3);
-  }
+// Aplica ajuste de brilho (brightness) para simular tons de pele
+function adjustBrightnessRgb(r, g, b, brightnessFactor) {
+  // brightnessFactor: 0.0 = muito escuro, 1.0 = original, 2.0 = muito claro
   return {
-    r: Math.max(0, Math.min(255, Math.round(r * 255))),
-    g: Math.max(0, Math.min(255, Math.round(g * 255))),
-    b: Math.max(0, Math.min(255, Math.round(b * 255)))
+    r: Math.max(0, Math.min(255, Math.round(r * brightnessFactor))),
+    g: Math.max(0, Math.min(255, Math.round(g * brightnessFactor))),
+    b: Math.max(0, Math.min(255, Math.round(b * brightnessFactor)))
   };
-}
-
-function rotateHueRgb(r,g,b, degrees){
-  const { h, s, l } = rgbToHsl(r,g,b);
-  let newH = (h + (degrees/360)) % 1;
-  if (newH < 0) newH += 1;
-  const { r:rr, g:gg, b:bb } = hslToRgb(newH, s, l);
-  return { r: rr, g: gg, b: bb };
 }
 
 // Desenha a imagem ajustando a matiz por pixel, preservando cores configuradas
@@ -164,9 +120,10 @@ async function drawWithSelectiveHue(ctx, img, targetW, targetH, partKey){
   const imageData = offCtx.getImageData(0,0,targetW,targetH);
   const data = imageData.data;
 
-  // Define matiz com base no input range (0..360) se existir atributo data-hue no body
-  // Aqui, para simplicidade, usamos um atributo opcional em window.avatarHue
-  const hueDegrees = window.avatarHue || 0;
+  // Define brilho com base no input range (0..100) convertido para fator de brilho
+  // 0 = muito escuro (pele preta), 50 = original, 100 = muito claro (pele branca)
+  const brightnessValue = window.avatarBrightness || 50;
+  const brightnessFactor = brightnessValue / 50; // 0.0 a 2.0
 
   for (let i = 0; i < data.length; i += 4){
     const r = data[i], g = data[i+1], b = data[i+2];
@@ -176,8 +133,8 @@ async function drawWithSelectiveHue(ctx, img, targetW, targetH, partKey){
     // Preserva cores configuradas
     if (shouldPreserveColor(partKey, r,g,b)) continue;
 
-    const rotated = rotateHueRgb(r,g,b, hueDegrees);
-    data[i] = rotated.r; data[i+1] = rotated.g; data[i+2] = rotated.b;
+    const adjusted = adjustBrightnessRgb(r,g,b, brightnessFactor);
+    data[i] = adjusted.r; data[i+1] = adjusted.g; data[i+2] = adjusted.b;
   }
 
   offCtx.putImageData(imageData, 0, 0);

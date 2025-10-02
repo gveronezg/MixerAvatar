@@ -100,9 +100,8 @@ export function setupSkinToneControl() {
     hueSlider.addEventListener('input', (e) => {
       const index = parseInt(e.target.value, 10);
       avatarManager.setSkinTone(index);
-      // Além do tom de pele, usamos o mesmo slider para definir o hue (graus)
-      // Caso queira separar depois, basta mover esta atribuição para outro controle
-      window.avatarHue = Number.isFinite(index) ? index : 0;
+      // Usa o slider para controlar brilho (0-100): 0=escuro, 50=original, 100=claro
+      window.avatarBrightness = Number.isFinite(index) ? index : 50;
       redrawCanvas(avatarManager.parts);
     });
   }
