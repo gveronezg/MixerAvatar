@@ -126,9 +126,13 @@ async function drawWithSelectiveBrightness(ctx, img, targetW, targetH){
   const data = imageData.data;
 
   // Define brilho com base no input range (0..100) convertido para fator de brilho
-  // 0 = muito escuro (pele preta), 50 = original, 100 = muito claro (pele branca)
+  // 0 = máximo escuro (0.28), 50 = original (1.0), 100 = máximo claro (1.22)
   const brightnessValue = window.avatarBrightness || 50; // padrão 50 (original)
-  const brightnessFactor = brightnessValue / 50; // 0.0 a 2.0
+  
+  // Mapeia 0-100 para 0.28-1.22 (baseado nos dados coletados)
+  const minFactor = 0.30; // máximo escuro
+  const maxFactor = 1.20; // máximo claro
+  const brightnessFactor = minFactor + (brightnessValue / 100) * (maxFactor - minFactor);
 
   for (let i = 0; i < data.length; i += 4){
     const r = data[i], g = data[i+1], b = data[i+2];
