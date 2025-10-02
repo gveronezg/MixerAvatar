@@ -1,4 +1,4 @@
-import { DRAW_ORDER_KEYS, HUE_EDIT_CONFIG } from './constants.js';
+import { DRAW_ORDER_KEYS, BRIGHTNESS_EDIT_CONFIG } from './constants.js';
 import { loadImage, drawSmoothImage } from './imageLoader.js';
 
 const canvas = document.getElementById('avatarCanvas');
@@ -39,12 +39,8 @@ export async function redrawCanvas(parts) {
 
     try {
       const img = await loadImage(url);
-      // Se a parte estiver habilitada para hue, desenha via pipeline com preservação
-      if (HUE_EDIT_CONFIG.enabledParts.includes(key)) {
-        await drawWithSelectiveHue(ctx, img, styleWidth, styleHeight, key);
-      } else {
-        drawSmoothImage(ctx, img, styleWidth, styleHeight);
-      }
+      // Sempre desenha via pipeline com preservação de cores específicas
+      await drawWithSelectiveBrightness(ctx, img, styleWidth, styleHeight);
     } catch (e) {
       console.warn('Erro carregando', url);
     }
@@ -66,12 +62,21 @@ function colorDistanceSq(r1,g1,b1,r2,g2,b2){
   return dr*dr + dg*dg + db*db;
 }
 
-function shouldPreserveColor(partKey, r,g,b){
-  const perPart = HUE_EDIT_CONFIG.perPartPreserve && HUE_EDIT_CONFIG.perPartPreserve[partKey] || [];
-  const global = HUE_EDIT_CONFIG.preserveColors || [];
-  // Prioridade: regras por parte, depois globais
-  const candidates = [...perPart, ...global];
-  for (const rule of candidates){
+function shouldPreserveColor(r,g,b){
+  const preserveColors = BRIGHTNESS_EDIT_CONFIG.preserveColors || [];
+  for (const rule of preserveColors){
+    const { hex, tolerance = 16 } = rule;
+    const { r:pr, g:pg, b:pb } = hexToRgb(hex);
+    if (colorDistanceSq(r,g,b, pr,pg,pb) <= tolerance*tolerance){
+      return true;
+    }
+  }
+  return false;
+}
+
+function shouldApplyBrightness(r,g,b){
+  const enabledColors = BRIGHTNESS_EDIT_CONFIG.enabledColors || [];
+  for (const rule of enabledColors){
     const { hex, tolerance = 16 } = rule;
     const { r:pr, g:pg, b:pb } = hexToRgb(hex);
     if (colorDistanceSq(r,g,b, pr,pg,pb) <= tolerance*tolerance){
@@ -91,8 +96,8 @@ function adjustBrightnessRgb(r, g, b, brightnessFactor) {
   };
 }
 
-// Desenha a imagem ajustando a matiz por pixel, preservando cores configuradas
-async function drawWithSelectiveHue(ctx, img, targetW, targetH, partKey){
+// Desenha a imagem ajustando o brilho por pixel, preservando cores configuradas
+async function drawWithSelectiveBrightness(ctx, img, targetW, targetH){
   // Desenha em um canvas offscreen para pegar os pixels do destino já escalados
   const off = document.createElement('canvas');
   off.width = targetW; off.height = targetH;
@@ -122,7 +127,7 @@ async function drawWithSelectiveHue(ctx, img, targetW, targetH, partKey){
 
   // Define brilho com base no input range (0..100) convertido para fator de brilho
   // 0 = muito escuro (pele preta), 50 = original, 100 = muito claro (pele branca)
-  const brightnessValue = window.avatarBrightness || 50;
+  const brightnessValue = window.avatarBrightness || 50; // padrão 50 (original)
   const brightnessFactor = brightnessValue / 50; // 0.0 a 2.0
 
   for (let i = 0; i < data.length; i += 4){
@@ -130,11 +135,14 @@ async function drawWithSelectiveHue(ctx, img, targetW, targetH, partKey){
     const a = data[i+3];
     if (a === 0) continue; // totalmente transparente
 
-    // Preserva cores configuradas
-    if (shouldPreserveColor(partKey, r,g,b)) continue;
+    // Preserva cores configuradas (branco, preto, etc.)
+    if (shouldPreserveColor(r,g,b)) continue;
 
-    const adjusted = adjustBrightnessRgb(r,g,b, brightnessFactor);
-    data[i] = adjusted.r; data[i+1] = adjusted.g; data[i+2] = adjusted.b;
+    // Aplica brilho apenas nas cores específicas habilitadas
+    if (shouldApplyBrightness(r,g,b)) {
+      const adjusted = adjustBrightnessRgb(r,g,b, brightnessFactor);
+      data[i] = adjusted.r; data[i+1] = adjusted.g; data[i+2] = adjusted.b;
+    }
   }
 
   offCtx.putImageData(imageData, 0, 0);

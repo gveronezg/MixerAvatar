@@ -33,29 +33,22 @@ export const CATEGORY_TITLES = {
   glasses: "VOCÊ VAI QUERER USAR ALGUM ACESSÓRIO?"
 };
 
-// Configuração do editor de matiz (hue)
-// - enabledParts: quais partes podem ser afetadas pelo hueRange
-// - preserveColors: lista global de cores a preservar (ex.: branco dos olhos)
-// - perPartPreserve: lista de cores preservadas por parte, com prioridade sobre a global
-// - tolerance: tolerância (0-255) para considerar "igual" a uma cor
-export const HUE_EDIT_CONFIG = {
-  enabledParts: ['base','eyes','nose','mouth'], // partes que podem ser afetadas pelo hue
+// Configuração do editor de brilho
+// - enabledColors: cores específicas que podem ser afetadas pelo brightness
+// - preserveColors: cores que devem ser preservadas (não alteradas)
+export const BRIGHTNESS_EDIT_CONFIG = {
+  enabledColors: [
+    // cor 1 - matiz: 24, sat: 232, lum: 186
+    { hex: '#FDD08F', tolerance: 24 },
+    // cor 2 - matiz: 10, sat: 157, lum: 153
+    { hex: '#DF8567', tolerance: 24 },
+    // cor 3 - matiz: 19, sat: 217, lum: 172
+    { hex: '#F8B275', tolerance: 24 },
+  ],
   preserveColors: [
     // branco puro
     { hex: '#FFFFFF', tolerance: 24 },
     // preto puro
     { hex: '#000000', tolerance: 24 },
-  ],
-  perPartPreserve: {
-    eyes: [
-      { hex: '#FFFFFF', tolerance: 28 }, // preserva "branco do olho"
-      { hex: '#F9F9F9', tolerance: 24 }
-    ],
-    base: [
-      // adicione tons específicos que deseja congelar na pele
-    ],
-    hair: [
-      // geralmente cabelo pode ser todo alterado; deixe vazio ou ajuste conforme necessário
-    ]
-  }
+  ]
 };
