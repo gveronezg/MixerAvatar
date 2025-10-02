@@ -95,6 +95,9 @@ function updateTitle() {
   }
 }
 
+// Variável para armazenar o timeout do debounce
+let redrawTimeout = null;
+
 export function setupSkinToneControl() {
   if (hueSlider) {
     hueSlider.addEventListener('input', (e) => {
@@ -102,7 +105,17 @@ export function setupSkinToneControl() {
       avatarManager.setSkinTone(index);
       // Usa o slider para controlar brilho (0-100): 0=escuro, 50=original, 100=claro
       window.avatarBrightness = Number.isFinite(index) ? index : 50;
-      redrawCanvas(avatarManager.parts);
+      
+      // Cancela o redraw anterior se ainda não executou
+      if (redrawTimeout) {
+        clearTimeout(redrawTimeout);
+      }
+      
+      // Agenda o redraw para 500ms após parar de mover o slider
+      redrawTimeout = setTimeout(() => {
+        redrawCanvas(avatarManager.parts);
+        redrawTimeout = null;
+      }, 500);
     });
   }
 }
