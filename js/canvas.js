@@ -1,49 +1,46 @@
-import { parts } from './parts.js';
-import { skinToneIndex } from './ui.js';
-import { DRAW_ORDER_KEYS, SKIN_TONES } from './constants.js';
+import { DRAW_ORDER_KEYS } from './constants.js';
 import { loadImage, drawSmoothImage } from './imageLoader.js';
 
-const canvas = document.getElementById('avatarCanvas'); // elemento canvas
-const ctx = canvas.getContext('2d', { alpha: true }); // contexto 2D do canvas
+const canvas = document.getElementById('avatarCanvas');
+const ctx = canvas.getContext('2d', { alpha: true });
 
-// Ajusta o tamanho do canvas para o DPI do dispositivo
 export function fixCanvasDPI() {
-  const area = document.querySelector('.canvas-area');  // área que contém o canvas
-  const size = Math.min(area.clientWidth, area.clientHeight); // tamanho baseado na menor dimensão da área
-  const ratio = window.devicePixelRatio || 1; // fator de escala baseado no DPI do dispositivo
+  const area = document.querySelector('.canvas-area');
+  if (!area) return;
+  
+  const size = Math.min(area.clientWidth, area.clientHeight);
+  const ratio = window.devicePixelRatio || 1;
 
-  canvas.width = size * ratio; // largura do canvas em pixels
-  canvas.height = size * ratio; // altura do canvas em pixels
+  canvas.width = size * ratio;
+  canvas.height = size * ratio;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
 
-  canvas.style.width = size + 'px'; // largura do canvas em CSS
-  canvas.style.height = size + 'px'; // altura do canvas em CSS
-
-  ctx.setTransform(1,0,0,1,0,0); // reseta transformações anteriores
-  ctx.scale(ratio, ratio); // aplica escala baseada no DPI
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(ratio, ratio);
 }
 
-// redesenha o canvas com as partes selecionadas
-export async function redrawCanvas() {
-  const styleWidth = parseInt(getComputedStyle(canvas).width, 10); // largura em CSS
-  const styleHeight = parseInt(getComputedStyle(canvas).height, 10); // altura em CSS
+export async function redrawCanvas(parts) {
+  if (!parts) return;
+  
+  const styleWidth = parseInt(getComputedStyle(canvas).width, 10);
+  const styleHeight = parseInt(getComputedStyle(canvas).height, 10);
 
   ctx.clearRect(0, 0, styleWidth, styleHeight);
-
   ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingQuality = 'low';
 
   for (const key of DRAW_ORDER_KEYS) {
-    const p = parts.find(pt => pt.key === key);
-    if (!p || p.options.length === 0) continue;
+    const part = parts.find(p => p.key === key);
+    if (!part || part.options.length === 0) continue;
 
-    const url = p.options[p.currentIndex];
-
-    if (url.endsWith('glasses02.png')) continue; // Se for a segunda opção de óculos, deixa o avatar sem óculos
+    const url = part.options[part.currentIndex];
+    if (url.endsWith('glasses02.png')) continue;
 
     try {
       const img = await loadImage(url);
-      await drawSmoothImage(ctx, img, styleWidth, styleHeight);
-    } catch(e) {
+      drawSmoothImage(ctx, img, styleWidth, styleHeight);
+    } catch (e) {
       console.warn('Erro carregando', url);
     }
   }

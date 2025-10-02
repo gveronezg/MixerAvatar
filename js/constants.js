@@ -1,6 +1,5 @@
-export const ASSETS_BASE = 'assets'; // pasta com imagens
+export const ASSETS_BASE = 'assets';
 
-// Cada categoria possui prefixo e uma faixa de probeMax para definir quantas imagens deve carregar
 export const CATEGORIES = [
   { key: 'base', label: 'Base', prefix: 'base', probeMax: 6 },
   { key: 'clothing', label: 'Roupas', prefix: 'clothing', probeMax: 14 },
@@ -12,7 +11,6 @@ export const CATEGORIES = [
   { key: 'glasses', label: 'Óculos', prefix: 'glasses', probeMax: 13 },
 ];
 
-// Ordem de desenho no canvas (de baixo para cima)
 export const DRAW_ORDER_KEYS = [
   'base','clothing','eyes','eyebrows','nose','mouth','hair','glasses'
 ];
