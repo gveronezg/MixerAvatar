@@ -1,4 +1,4 @@
-import { parts } from './parts.js';
+import { parts, activePart } from './parts.js';
 import { setActivePart } from './parts.js';
 import { redrawCanvas } from './canvas.js';
 
@@ -37,10 +37,10 @@ export function renderHeader(){
 }
 
 export function highlightActiveThumb(){
-  const thumbs = partsRow.querySelectorAll('.part-thumb');
-  thumbs.forEach((t,idx)=>{
-    t.classList.toggle('active', idx===parts.activePart);
-    t.setAttribute('aria-pressed', idx===parts.activePart?'true':'false');
+  const thumbs = document.querySelectorAll('.part-thumb');
+  thumbs.forEach((t, idx) => {
+    t.classList.toggle('active', idx === activePart);
+    t.setAttribute('aria-pressed', idx === activePart ? 'true' : 'false');
   });
 }
 

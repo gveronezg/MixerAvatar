@@ -97,7 +97,7 @@ body{
   /* cantos arredondados */
   border-radius:var(--pxls);
   /* borda transparente padrão (ficará colorida se ativo) */
-  border:2px solid transparent;
+  border:3px solid transparent;
   /* centraliza conteúdo interno (imagem/ícone/numero) */
   display:flex;
   align-items:center;

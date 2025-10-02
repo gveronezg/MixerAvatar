@@ -8,12 +8,12 @@ export function loadImage(src){
   });
 }
 
-/**
- * Desenha a imagem ocupando todo o canvas sem distorcer,
- * preservando proporção, com suavização de pixels.
- */
+/*
+  * Desenha a imagem ocupando todo o canvas sem distorcer,
+  * preservando proporção, com suavização de pixels.
+*/
 export async function drawSmoothImage(ctx, img, canvasWidth, canvasHeight) {
-  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingEnabled = false;
   ctx.imageSmoothingQuality = 'low';
 
   // Calcula proporção da imagem
