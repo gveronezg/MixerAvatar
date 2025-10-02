@@ -1,6 +1,18 @@
 import { parts, activePart, setActivePart } from './parts.js';
 import { redrawCanvas } from './canvas.js';
 import { CATEGORY_TITLES } from './texts.js';
+import { SKIN_TONES } from './constants.js';
+
+export let skinToneIndex = 0;
+
+const hueSlider = document.getElementById('hueRange');
+const skinLabel = document.getElementById('skinLabel');
+
+hueSlider.addEventListener('input', (e) => {
+  skinToneIndex = parseInt(e.target.value, 10);
+  skinLabel.textContent = SKIN_TONES[skinToneIndex].label.toUpperCase();
+  redrawCanvas();
+});
 
 const headerTitle = document.querySelector('h1'); // pega o h1
 const partsRow = document.getElementById('partsRow');

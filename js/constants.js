@@ -16,3 +16,10 @@ export const CATEGORIES = [
 export const DRAW_ORDER_KEYS = [
   'base','clothing','eyes','eyebrows','nose','mouth','hair','glasses'
 ];
+
+export const SKIN_TONES = [
+  { label: "clara", rgb: [248,178,117] },
+  { label: "escura", rgb: [106,57,42] },
+  { label: "bronze", rgb: [149,81,42] },
+  { label: "morena clara", rgb: [174,108,74] }
+];

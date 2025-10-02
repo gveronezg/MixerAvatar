@@ -1,5 +1,6 @@
 import { parts } from './parts.js';
-import { DRAW_ORDER_KEYS } from './constants.js';
+import { skinToneIndex } from './ui.js';
+import { DRAW_ORDER_KEYS, SKIN_TONES } from './constants.js';
 import { loadImage, drawSmoothImage } from './imageLoader.js';
 
 const canvas = document.getElementById('avatarCanvas');
