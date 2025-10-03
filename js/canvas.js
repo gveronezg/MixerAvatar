@@ -27,7 +27,7 @@ export async function redrawCanvas(parts) {
   const styleHeight = parseInt(getComputedStyle(canvas).height, 10);
 
   ctx.clearRect(0, 0, styleWidth, styleHeight);
-  ctx.imageSmoothingEnabled = false;
+  ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'low';
 
   for (const key of DRAW_ORDER_KEYS) {
@@ -126,10 +126,10 @@ async function drawWithSelectiveBrightness(ctx, img, targetW, targetH){
   const data = imageData.data;
 
   // Define brilho com base no input range (0..100) convertido para fator de brilho
-  // 0 = máximo escuro (0.28), 50 = original (1.0), 100 = máximo claro (1.22)
+  // 0 = máximo escuro (0.30), 50 = original (1.0), 100 = máximo claro (1.20)
   const brightnessValue = window.avatarBrightness || 50; // padrão 50 (original)
   
-  // Mapeia 0-100 para 0.28-1.22 (baseado nos dados coletados)
+  // Mapeia 0-100 para 0.30-1.20
   const minFactor = 0.30; // máximo escuro
   const maxFactor = 1.20; // máximo claro
   const brightnessFactor = minFactor + (brightnessValue / 100) * (maxFactor - minFactor);
