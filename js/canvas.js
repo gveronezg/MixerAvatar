@@ -4,6 +4,19 @@ import { loadImage, drawSmoothImage } from './imageLoader.js';
 const canvas = document.getElementById('avatarCanvas');
 const ctx = canvas.getContext('2d', { alpha: true });
 
+// Controle de suavização (toggle por clique)
+let smoothingEnabled = false;
+let lastParts = null;
+
+if (canvas) {
+  canvas.addEventListener('click', () => {
+    smoothingEnabled = !smoothingEnabled;
+    if (lastParts) {
+      redrawCanvas(lastParts);
+    }
+  });
+}
+
 export function fixCanvasDPI() {
   const area = document.querySelector('.canvas-area');
   if (!area) return;
@@ -22,13 +35,15 @@ export function fixCanvasDPI() {
 
 export async function redrawCanvas(parts) {
   if (!parts) return;
+  lastParts = parts;
   
   const styleWidth = parseInt(getComputedStyle(canvas).width, 10);
   const styleHeight = parseInt(getComputedStyle(canvas).height, 10);
 
   ctx.clearRect(0, 0, styleWidth, styleHeight);
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'low';
+  // Smoothing desligado para manter nitidez (pode ligar via clique no canvas)
+  ctx.imageSmoothingEnabled = !!smoothingEnabled;
+  ctx.imageSmoothingQuality = smoothingEnabled ? 'midium' : 'low';
 
   for (const key of DRAW_ORDER_KEYS) {
     const part = parts.find(p => p.key === key);
@@ -98,31 +113,17 @@ function adjustBrightnessRgb(r, g, b, brightnessFactor) {
 
 // Desenha a imagem ajustando o brilho por pixel, preservando cores configuradas
 async function drawWithSelectiveBrightness(ctx, img, targetW, targetH){
-  // Desenha em um canvas offscreen para pegar os pixels do destino já escalados
+  // PROCESSA NO TAMANHO NATIVO DA IMAGEM (evita blur de reamostragem)
   const off = document.createElement('canvas');
-  off.width = targetW; off.height = targetH;
-  const offCtx = off.getContext('2d');
+  off.width = img.naturalWidth || img.width;
+  off.height = img.naturalHeight || img.height;
+  const offCtx = off.getContext('2d', { willReadFrequently: true });
   offCtx.imageSmoothingEnabled = false;
-  offCtx.imageSmoothingQuality = 'low';
-  // Reusa a mesma lógica de posicionamento do drawSmoothImage
-  const imgRatio = img.width / img.height;
-  const canvasRatio = targetW / targetH;
-  let drawWidth, drawHeight, offsetX, offsetY;
-  if (canvasRatio > imgRatio) {
-    drawHeight = targetH;
-    drawWidth = drawHeight * imgRatio;
-    offsetX = (targetW - drawWidth) / 2;
-    offsetY = 0;
-  } else {
-    drawWidth = targetW;
-    drawHeight = drawWidth / imgRatio;
-    offsetX = 0;
-    offsetY = (targetH - drawHeight) / 2;
-  }
-  offCtx.clearRect(0,0,targetW,targetH);
-  offCtx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  offCtx.clearRect(0,0,off.width,off.height);
+  // Desenha 1:1 sem reescalar
+  offCtx.drawImage(img, 0, 0);
 
-  const imageData = offCtx.getImageData(0,0,targetW,targetH);
+  const imageData = offCtx.getImageData(0,0,off.width,off.height);
   const data = imageData.data;
 
   // Define brilho com base no input range (0..100) convertido para fator de brilho
@@ -150,5 +151,29 @@ async function drawWithSelectiveBrightness(ctx, img, targetW, targetH){
   }
 
   offCtx.putImageData(imageData, 0, 0);
-  ctx.drawImage(off, 0, 0);
+
+  // CALCULA DESTINO mantendo proporção e alinhando a pixels inteiros
+  const imgRatio = off.width / off.height;
+  const canvasRatio = targetW / targetH;
+  let dw, dh, dx, dy;
+  if (canvasRatio > imgRatio) {
+    dh = Math.round(targetH);
+    dw = Math.round(dh * imgRatio);
+    dx = Math.round((targetW - dw) / 2);
+    dy = 0;
+  } else {
+    dw = Math.round(targetW);
+    dh = Math.round(dw / imgRatio);
+    dx = 0;
+    dy = Math.round((targetH - dh) / 2);
+  }
+
+  // define smoothing conforme toggle para o reescalonamento final
+  const prevSmooth = ctx.imageSmoothingEnabled;
+  const prevQual = ctx.imageSmoothingQuality;
+  ctx.imageSmoothingEnabled = !!smoothingEnabled;
+  ctx.imageSmoothingQuality = smoothingEnabled ? 'high' : 'low';
+  ctx.drawImage(off, 0, 0, off.width, off.height, dx, dy, dw, dh);
+  ctx.imageSmoothingEnabled = prevSmooth;
+  ctx.imageSmoothingQuality = prevQual;
 }
